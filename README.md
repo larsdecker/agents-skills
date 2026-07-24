@@ -1,0 +1,116 @@
+# Claude Code Skills von Lars Decker
+
+Zwei Skills für Claude Code an der Schnittstelle zwischen Produktarbeit und Entwicklung. Beide liefern belegbare Ergebnisse aus messbaren Signalen – keine Einschätzungen aus dem Bauch, keine erfundenen Zahlen.
+
+Warum diese zwei: Die meisten veröffentlichten Skills helfen beim Schreiben von Code. Diese beiden helfen bei Entscheidungen **über** Code – Priorisierung, Begründung, Auffindbarkeit.
+
+| Skill | Was er tut |
+| :-- | :-- |
+| **tech-debt-ledger** | Erzeugt aus einem Git-Repository ein Tech-Debt-Register in Stakeholder-Sprache: Hotspots aus Churn × Größe, Änderungskopplung, Wissensrisiken, Testlücken – übersetzt in Risiko und kleinste wirksame Gegenmaßnahme. |
+| **geo-audit** | Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen: Retrieval-Crawler-Zugang, llms.txt, Entity-Klarheit über JSON-LD, Zitierfähigkeit der Absätze – mit konkreter Fix-Liste. |
+
+## Installation
+
+```bash
+/plugin marketplace add larsdecker/claude-skills
+```
+
+Danach einzeln installieren:
+
+```bash
+/plugin install tech-debt-ledger@lars-decker
+```
+
+```bash
+/plugin install geo-audit@lars-decker
+```
+
+`/reload-plugins` aktiviert sie in der laufenden Sitzung. Claude lädt beide Skills auch selbstständig, wenn ein Thema passt – du musst sie nicht per Slash-Befehl aufrufen.
+
+Voraussetzung: Node ≥ 18 für die mitgelieferten Scripts. Keine weiteren Abhängigkeiten.
+
+## tech-debt-ledger
+
+**Das Problem:** Entwickler sehen technische Schulden, können sie aber nicht in Budget übersetzen. Product Owner müssen sie priorisieren, können sie aber nicht selbst erkennen. Beide Seiten reden über dasselbe und meinen Verschiedenes.
+
+**Was der Skill macht:** Er kombiniert Änderungshäufigkeit mit Umfang. Der Kern ist eine einfache, aber folgenreiche Unterscheidung: eine große Datei, die niemand anfasst, kostet nichts. Eine große Datei, die wöchentlich geändert wird, zahlt den Aufschlag bei jeder Anforderung erneut. Nur die zweite gehört in ein Register.
+
+Signale, die erhoben werden:
+
+- **Hotspots** — Churn × Größe, normalisiert auf das Maximum im Zeitfenster
+- **Änderungskopplung** — Dateien, die regelmäßig gemeinsam geändert werden, obwohl sie in getrennten Modulen liegen; der beste verfügbare Hinweis auf fehlende Abstraktion
+- **Wissensrisiko** — hoher Churn bei einem einzigen Autor (wird in Solo-Repos unterdrückt, weil es dort keine Erkenntnis ist)
+- **Testlücken** — Hotspots ohne zugeordnete Testdatei; fehlt Testinfrastruktur ganz, wird daraus ein struktureller Eintrag statt einer Liste
+- **Toter Code** — unberührt und unreferenziert, mit Filter für Konventions-Einstiegspunkte wie `page.tsx` oder `*.config.js`
+
+Ausgabe ist ein `TECH-DEBT.md`, das bei jedem Durchlauf fortgeschrieben wird: bestehende Einträge werden aktualisiert, erledigte wandern mit Datum in einen Abschnitt „Behoben". Der eigentliche Wert entsteht beim zweiten Durchlauf, wenn eine Entwicklung sichtbar wird statt eines Zustands.
+
+**Was er bewusst nicht tut:** keine Aufwandsschätzung in Personentagen (das kann nur das Team), keine statische Codeanalyse (dafür gibt es ESLint und Sonar), keine Sicherheitsprüfung.
+
+Direkt aufrufen:
+
+```bash
+node skills/tech-debt-ledger/scripts/scan-repo.mjs --since 12m --top 25 --json
+```
+
+## geo-audit
+
+**Das Problem:** Antwortmaschinen zitieren Absätze, keine Seiten. Klassische SEO-Werkzeuge messen das nicht, weil sie auf Ranking optimieren – nicht auf Übernehmbarkeit einer Aussage.
+
+**Was der Skill macht:**
+
+- **Crawler-Zugang** mit der Unterscheidung, die fast überall fehlt: Retrieval gegen Training. `GPTBot` zu blockieren kostet keine Sichtbarkeit in Antworten, `OAI-SearchBot` zu blockieren schon. Ein blockierter Training-Bot wird deshalb als Feststellung gemeldet, nicht als Fehler.
+- **Entity-Klarheit** — JSON-LD auf `Person`/`Organization`, `@id`-Verknüpfung über Seiten hinweg, `sameAs`-Anker. Für Einzelpersonen und kleine Firmen der wirksamste Hebel, weil er Autorität herstellt, die sonst nur über Bekanntheit entsteht.
+- **Zitierfähigkeit** — Anteil der Sätze, die mit einem Rückverweis beginnen und außerhalb ihres Kontexts unbrauchbar sind; Satzlängen; ob die Antwort vor der Herleitung steht. Prosa-Kriterien werden nur auf Artikelseiten angewandt: auf Übersichtsseiten verschmelzen Teaser-Fragmente zu Scheinsätzen und verzerren jede Messung.
+- **Struktur** — Fragen als Überschriften, extrahierbare Listen und Tabellen, saubere Hierarchie
+- **llms.txt** — Vorhandensein und Aufbau, inklusive Erkennung des häufigsten Fehlers: eine SPA liefert für `/llms.txt` HTML mit Status 200 aus, und die Datei ist praktisch nicht vorhanden
+
+Direkt aufrufen:
+
+```bash
+node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
+```
+
+Das Script führt nur GET-Anfragen aus, wartet zwischen Seiten und identifiziert sich mit eigenem User-Agent.
+
+**Was er bewusst nicht tut:** keine Messung tatsächlicher Sichtbarkeit. Ob ein Modell zitiert, hängt von Trainingsdaten, Index-Stand und Konkurrenz zur konkreten Frage ab – nichts davon ist von außen prüfbar. Der Audit prüft Voraussetzungen, nicht Ergebnisse. Wer eine Garantie verspricht, verkauft etwas anderes.
+
+## Aufbau des Repositories
+
+```
+.claude-plugin/marketplace.json     Marketplace-Katalog
+plugins/
+├── tech-debt-ledger/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/tech-debt-ledger/
+│       ├── SKILL.md                Ablauf und Regeln
+│       ├── references/             Taxonomie, Stakeholder-Sprache, Vorlage
+│       └── scripts/scan-repo.mjs   Signalerhebung, abhängigkeitsfrei
+└── geo-audit/
+    ├── .claude-plugin/plugin.json
+    └── skills/geo-audit/
+        ├── SKILL.md
+        ├── references/             Kriterien, Crawler, llms.txt, Fix-Muster
+        └── scripts/geo-scan.mjs
+examples/                           Beispielausgaben beider Scans
+```
+
+Beide Scripts laufen auch ohne Claude Code als normale Node-Programme.
+
+## Hintergrund
+
+Ausführlich beschrieben in:
+
+- [Technische Schulden sichtbar machen](https://lars-decker.eu/blog/tech-debt-sichtbar-machen)
+- [SEO ist nicht mehr genug: GEO](https://lars-decker.eu/blog/seo-ist-nicht-mehr-genug-geo)
+- [Wie ich mir mit KI-Skills den PO-Alltag leichter mache](https://lars-decker.eu/blog/ki-skills-fuer-product-owner)
+
+Übersicht und Details: [lars-decker.eu/skills](https://lars-decker.eu/skills)
+
+## Rückmeldungen
+
+Issues und Pull Requests sind willkommen. Besonders wertvoll: Fälle, in denen ein Scan einen falsch positiven Befund liefert. Beide Skills leben davon, dass ihre Heuristiken an echten Repositories und echten Sites geschärft werden – ein gemeldeter Fehlbefund verbessert sie mehr als eine neue Prüfung.
+
+## Lizenz
+
+MIT

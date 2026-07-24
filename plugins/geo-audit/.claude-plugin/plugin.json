@@ -1,0 +1,14 @@
+{
+  "name": "geo-audit",
+  "displayName": "GEO Audit",
+  "version": "0.1.0",
+  "description": "Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen und liefert eine konkrete Fix-Liste.",
+  "author": {
+    "name": "Lars Decker",
+    "url": "https://lars-decker.eu"
+  },
+  "homepage": "https://lars-decker.eu/skills/geo-audit",
+  "repository": "https://github.com/larsdecker/claude-skills",
+  "license": "MIT",
+  "keywords": ["geo", "seo", "llms-txt", "structured-data", "ai-search", "generative-engine-optimization"]
+}
