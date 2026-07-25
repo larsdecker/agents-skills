@@ -37,15 +37,23 @@ Frage nach dem **Ziel der Sichtbarkeit**, wenn es nicht aus dem Gespräch hervor
 
 ### Schritt 2: Scan ausführen
 
+Das Script liegt neben dieser Datei unter `scripts/geo-scan.mjs`:
+
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/skills/geo-audit/scripts/geo-scan.mjs" --site https://example.com --max-pages 5
+node scripts/geo-scan.mjs --site https://example.com --max-pages 5
 ```
 
 Einzelne Seiten prüfen:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/skills/geo-audit/scripts/geo-scan.mjs" https://example.com/artikel-a https://example.com/artikel-b
+node scripts/geo-scan.mjs https://example.com/artikel-a https://example.com/artikel-b
 ```
+
+Den passenden Pfad bestimmen:
+
+- **Claude Code als Plugin:** `node "${CLAUDE_PLUGIN_ROOT}/scripts/geo-scan.mjs" --site …`
+- **Andere Agenten oder manuelle Installation:** relativ zum Verzeichnis dieser `SKILL.md`. Übliche Orte sind `.agents/skills/geo-audit/`, `.claude/skills/geo-audit/` oder ein Checkout des Repositories.
+- **Pfad unbekannt:** im Projekt nach `geo-scan.mjs` suchen, statt zu raten.
 
 | Option | Wirkung |
 | :-- | :-- |

@@ -1,14 +1,21 @@
 {
   "name": "tech-debt-ledger",
   "displayName": "Tech Debt Ledger",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Erzeugt aus einem Git-Repository ein belegbares Tech-Debt-Register in Stakeholder-Sprache.",
   "author": {
     "name": "Lars Decker",
     "url": "https://lars-decker.eu"
   },
   "homepage": "https://lars-decker.eu/skills/tech-debt-ledger",
-  "repository": "https://github.com/larsdecker/claude-skills",
+  "repository": "https://github.com/larsdecker/agent-skills",
   "license": "MIT",
-  "keywords": ["tech-debt", "product-owner", "refactoring", "git", "hotspots", "priorisierung"]
+  "keywords": [
+    "tech-debt",
+    "product-owner",
+    "refactoring",
+    "git",
+    "hotspots",
+    "priorisierung"
+  ]
 }

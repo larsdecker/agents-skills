@@ -1,20 +1,17 @@
 {
   "name": "lars-decker",
-  "description": "Skills für Product Owner mit Entwickler-Background: technische Schulden sichtbar machen und Websites für KI-Antwortmaschinen auffindbar machen.",
-  "version": "0.1.0",
+  "description": "Agent Skills für Product Owner mit Entwickler-Background: technische Schulden sichtbar machen und Websites für KI-Antwortmaschinen auffindbar machen. Nutzbar in Claude Code und anderen Coding-Agenten.",
+  "version": "0.2.0",
   "owner": {
     "name": "Lars Decker",
     "email": "decker@ascora.de"
   },
-  "metadata": {
-    "pluginRoot": "./plugins"
-  },
   "plugins": [
     {
       "name": "tech-debt-ledger",
-      "source": "./tech-debt-ledger",
+      "source": "./skills/tech-debt-ledger",
       "description": "Erzeugt aus einem Git-Repository ein belegbares Tech-Debt-Register in Stakeholder-Sprache: Hotspots aus Churn und Größe, Wissensrisiken, fehlende Tests – übersetzt in Risiko und Handlungsempfehlung.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "product",
       "tags": ["tech-debt", "product-owner", "refactoring", "git", "stakeholder-kommunikation", "priorisierung"],
       "author": {
@@ -22,14 +19,14 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/tech-debt-ledger",
-      "repository": "https://github.com/larsdecker/claude-skills",
+      "repository": "https://github.com/larsdecker/agent-skills",
       "license": "MIT"
     },
     {
       "name": "geo-audit",
-      "source": "./geo-audit",
+      "source": "./skills/geo-audit",
       "description": "Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen (ChatGPT, Perplexity, AI Overviews): Crawler-Zugang, llms.txt, Entity-Klarheit, Zitierfähigkeit – inklusive konkreter Fix-Liste.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "web",
       "tags": ["geo", "seo", "llms-txt", "structured-data", "ai-search", "content"],
       "author": {
@@ -37,7 +34,7 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/geo-audit",
-      "repository": "https://github.com/larsdecker/claude-skills",
+      "repository": "https://github.com/larsdecker/agent-skills",
       "license": "MIT"
     }
   ]

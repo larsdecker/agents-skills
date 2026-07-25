@@ -39,9 +39,17 @@ Wenn der Nutzer nicht antworten will oder es schnell gehen soll: scanne trotzdem
 
 ### Schritt 2: Scan ausführen
 
+Das Script liegt neben dieser Datei unter `scripts/scan-repo.mjs`:
+
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/skills/tech-debt-ledger/scripts/scan-repo.mjs" --json
+node scripts/scan-repo.mjs --json
 ```
+
+Den passenden Pfad bestimmen:
+
+- **Claude Code als Plugin:** `node "${CLAUDE_PLUGIN_ROOT}/scripts/scan-repo.mjs" --json`
+- **Andere Agenten oder manuelle Installation:** relativ zum Verzeichnis dieser `SKILL.md`. Übliche Orte sind `.agents/skills/tech-debt-ledger/`, `.claude/skills/tech-debt-ledger/` oder ein Checkout des Repositories.
+- **Pfad unbekannt:** im Projekt nach `scan-repo.mjs` suchen, statt zu raten.
 
 Nützliche Optionen:
 

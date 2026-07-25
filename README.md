@@ -1,6 +1,6 @@
-# Claude Code Skills von Lars Decker
+# Agent Skills von Lars Decker
 
-Zwei Skills für Claude Code an der Schnittstelle zwischen Produktarbeit und Entwicklung. Beide liefern belegbare Ergebnisse aus messbaren Signalen – keine Einschätzungen aus dem Bauch, keine erfundenen Zahlen.
+Zwei Skills für Coding-Agenten an der Schnittstelle zwischen Produktarbeit und Entwicklung. Beide liefern belegbare Ergebnisse aus messbaren Signalen – keine Einschätzungen aus dem Bauch, keine erfundenen Zahlen.
 
 Warum diese zwei: Die meisten veröffentlichten Skills helfen beim Schreiben von Code. Diese beiden helfen bei Entscheidungen **über** Code – Priorisierung, Begründung, Auffindbarkeit.
 
@@ -9,13 +9,57 @@ Warum diese zwei: Die meisten veröffentlichten Skills helfen beim Schreiben von
 | **tech-debt-ledger** | Erzeugt aus einem Git-Repository ein Tech-Debt-Register in Stakeholder-Sprache: Hotspots aus Churn × Größe, Änderungskopplung, Wissensrisiken, Testlücken – übersetzt in Risiko und kleinste wirksame Gegenmaßnahme. |
 | **geo-audit** | Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen: Retrieval-Crawler-Zugang, llms.txt, Entity-Klarheit über JSON-LD, Zitierfähigkeit der Absätze – mit konkreter Fix-Liste. |
 
-## Installation
+## Agentenunabhängig
+
+Ein Skill ist hier nichts anderes als eine `SKILL.md`: Markdown mit YAML-Frontmatter, daneben Referenztexte und abhängigkeitsfreie Node-Scripts. Nichts davon ist an einen Anbieter gebunden.
+
+Was sich zwischen den Agenten unterscheidet, ist nur, **wo sie nach Anweisungen suchen**. Genau das erledigt `install.mjs`: Es legt die Skill-Dateien unter `.agents/skills/<name>/` ab und schreibt an der jeweils erwarteten Stelle einen Einstiegspunkt, der darauf verweist.
 
 ```bash
-/plugin marketplace add larsdecker/claude-skills
+git clone https://github.com/larsdecker/agent-skills
+cd agent-skills
+node install.mjs --list
 ```
 
-Danach einzeln installieren:
+Dann in dein Projekt installieren:
+
+```bash
+node /pfad/zu/agent-skills/install.mjs --agent cursor --target .
+```
+
+| `--agent` | Agent | Wird geschrieben |
+| :-- | :-- | :-- |
+| `claude` | Claude Code | `.claude/skills/<name>/` (nativ, kein Verweis nötig) |
+| `cursor` | Cursor | `.cursor/rules/<name>.mdc` |
+| `copilot` | GitHub Copilot | `.github/instructions/<name>.instructions.md` |
+| `windsurf` | Windsurf | `.windsurf/rules/<name>.md` |
+| `cline` | Cline / Roo Code | `.clinerules/<name>.md` |
+| `agents` | Codex, Zed, Amp, opencode, Jules, Factory … | Abschnitt in `AGENTS.md` |
+| `gemini` | Gemini CLI | Abschnitt in `GEMINI.md` |
+
+Weitere Optionen: `--skill <name>` für einen einzelnen Skill, `--dry-run` zum Vorabprüfen.
+
+Die Abschnitte in `AGENTS.md` und `GEMINI.md` sind mit Markern versehen: ein erneuter Lauf ersetzt sie, statt sie zu duplizieren, und bestehender Inhalt der Datei bleibt unangetastet.
+
+**Dein Agent ist nicht dabei?** Dann kopiere das Skill-Verzeichnis an einen beliebigen Ort und verweise in der Anweisungsdatei deines Agenten darauf. Mehr braucht es nicht – die Skills enthalten keinen agentenspezifischen Code.
+
+**Ganz ohne Agent:** Beide Scan-Scripts sind normale Node-Programme (Node ≥ 18, keine Abhängigkeiten) und lassen sich direkt ausführen. Der Agent interpretiert die Ergebnisse, er erzeugt sie nicht.
+
+```bash
+node skills/tech-debt-ledger/scripts/scan-repo.mjs --since 12m --json
+```
+
+```bash
+node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
+```
+
+### Claude Code als Plugin
+
+In Claude Code geht es zusätzlich über den Plugin-Marketplace – dann übernimmt Claude Code Installation und Updates:
+
+```bash
+/plugin marketplace add larsdecker/agent-skills
+```
 
 ```bash
 /plugin install tech-debt-ledger@lars-decker
@@ -25,9 +69,7 @@ Danach einzeln installieren:
 /plugin install geo-audit@lars-decker
 ```
 
-`/reload-plugins` aktiviert sie in der laufenden Sitzung. Claude lädt beide Skills auch selbstständig, wenn ein Thema passt – du musst sie nicht per Slash-Befehl aufrufen.
-
-Voraussetzung: Node ≥ 18 für die mitgelieferten Scripts. Keine weiteren Abhängigkeiten.
+`/reload-plugins` aktiviert sie in der laufenden Sitzung.
 
 ## tech-debt-ledger
 
@@ -47,12 +89,6 @@ Ausgabe ist ein `TECH-DEBT.md`, das bei jedem Durchlauf fortgeschrieben wird: be
 
 **Was er bewusst nicht tut:** keine Aufwandsschätzung in Personentagen (das kann nur das Team), keine statische Codeanalyse (dafür gibt es ESLint und Sonar), keine Sicherheitsprüfung.
 
-Direkt aufrufen:
-
-```bash
-node skills/tech-debt-ledger/scripts/scan-repo.mjs --since 12m --top 25 --json
-```
-
 ## geo-audit
 
 **Das Problem:** Antwortmaschinen zitieren Absätze, keine Seiten. Klassische SEO-Werkzeuge messen das nicht, weil sie auf Ranking optimieren – nicht auf Übernehmbarkeit einer Aussage.
@@ -65,12 +101,6 @@ node skills/tech-debt-ledger/scripts/scan-repo.mjs --since 12m --top 25 --json
 - **Struktur** — Fragen als Überschriften, extrahierbare Listen und Tabellen, saubere Hierarchie
 - **llms.txt** — Vorhandensein und Aufbau, inklusive Erkennung des häufigsten Fehlers: eine SPA liefert für `/llms.txt` HTML mit Status 200 aus, und die Datei ist praktisch nicht vorhanden
 
-Direkt aufrufen:
-
-```bash
-node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
-```
-
 Das Script führt nur GET-Anfragen aus, wartet zwischen Seiten und identifiziert sich mit eigenem User-Agent.
 
 **Was er bewusst nicht tut:** keine Messung tatsächlicher Sichtbarkeit. Ob ein Modell zitiert, hängt von Trainingsdaten, Index-Stand und Konkurrenz zur konkreten Frage ab – nichts davon ist von außen prüfbar. Der Audit prüft Voraussetzungen, nicht Ergebnisse. Wer eine Garantie verspricht, verkauft etwas anderes.
@@ -78,28 +108,26 @@ Das Script führt nur GET-Anfragen aus, wartet zwischen Seiten und identifiziert
 ## Aufbau des Repositories
 
 ```
-.claude-plugin/marketplace.json     Marketplace-Katalog
-plugins/
+skills/                              agentenneutrale Quelle
 ├── tech-debt-ledger/
-│   ├── .claude-plugin/plugin.json
-│   └── skills/tech-debt-ledger/
-│       ├── SKILL.md                Ablauf und Regeln
-│       ├── references/             Taxonomie, Stakeholder-Sprache, Vorlage
-│       └── scripts/scan-repo.mjs   Signalerhebung, abhängigkeitsfrei
+│   ├── SKILL.md                     Ablauf und Regeln
+│   ├── references/                  Taxonomie, Stakeholder-Sprache, Vorlage
+│   ├── scripts/scan-repo.mjs        Signalerhebung, abhängigkeitsfrei
+│   └── .claude-plugin/plugin.json   Metadaten für Claude Code
 └── geo-audit/
-    ├── .claude-plugin/plugin.json
-    └── skills/geo-audit/
-        ├── SKILL.md
-        ├── references/             Kriterien, Crawler, llms.txt, Fix-Muster
-        └── scripts/geo-scan.mjs
-examples/                           Beispielausgaben beider Scans
+    ├── SKILL.md
+    ├── references/                  Kriterien, Crawler, llms.txt, Fix-Muster
+    ├── scripts/geo-scan.mjs
+    └── .claude-plugin/plugin.json
+
+install.mjs                          Installation je Agent
+.claude-plugin/marketplace.json      Marketplace-Katalog für Claude Code
+examples/                            echte Beispielausgaben beider Scans
 ```
 
-Beide Scripts laufen auch ohne Claude Code als normale Node-Programme.
+`skills/<name>/` ist die einzige Quelle. Es gibt keine agentenspezifischen Kopien, die auseinanderlaufen könnten – die Einstiegspunkte werden bei der Installation erzeugt und verweisen zurück auf diese Dateien.
 
 ## Hintergrund
-
-Ausführlich beschrieben in:
 
 - [Technische Schulden sichtbar machen](https://lars-decker.eu/blog/tech-debt-sichtbar-machen)
 - [SEO ist nicht mehr genug: GEO](https://lars-decker.eu/blog/seo-ist-nicht-mehr-genug-geo)
@@ -110,6 +138,8 @@ Ausführlich beschrieben in:
 ## Rückmeldungen
 
 Issues und Pull Requests sind willkommen. Besonders wertvoll: Fälle, in denen ein Scan einen falsch positiven Befund liefert. Beide Skills leben davon, dass ihre Heuristiken an echten Repositories und echten Sites geschärft werden – ein gemeldeter Fehlbefund verbessert sie mehr als eine neue Prüfung.
+
+Ein Adapter für einen weiteren Agenten ist ein kleiner Eingriff: ein Eintrag im `AGENTS`-Objekt in `install.mjs`.
 
 ## Lizenz
 
