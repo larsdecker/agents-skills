@@ -1,0 +1,14 @@
+{
+  "name": "seo-check",
+  "displayName": "SEO Check",
+  "version": "0.1.0",
+  "description": "Prüft eine Website auf technische SEO-Fehler gegen ein festes Regelwerk mit konkreten Schwellwerten.",
+  "author": {
+    "name": "Lars Decker",
+    "url": "https://lars-decker.eu"
+  },
+  "homepage": "https://lars-decker.eu/skills/seo-check",
+  "repository": "https://github.com/larsdecker/agent-skills",
+  "license": "MIT",
+  "keywords": ["seo", "technical-seo", "audit", "indexierung", "structured-data", "core-web-vitals"]
+}

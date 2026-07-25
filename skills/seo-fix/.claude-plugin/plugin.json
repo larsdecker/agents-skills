@@ -1,0 +1,14 @@
+{
+  "name": "seo-fix",
+  "displayName": "SEO Fix",
+  "version": "0.1.0",
+  "description": "Behebt technische SEO-Mängel im Code, priorisiert nach Wirkung, und prüft das Ergebnis nach.",
+  "author": {
+    "name": "Lars Decker",
+    "url": "https://lars-decker.eu"
+  },
+  "homepage": "https://lars-decker.eu/skills/seo-fix",
+  "repository": "https://github.com/larsdecker/agent-skills",
+  "license": "MIT",
+  "keywords": ["seo", "technical-seo", "metadata", "structured-data", "nextjs", "refactoring"]
+}

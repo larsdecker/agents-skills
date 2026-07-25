@@ -23,6 +23,36 @@
       "license": "MIT"
     },
     {
+      "name": "seo-check",
+      "source": "./skills/seo-check",
+      "description": "Prüft eine Website auf technische SEO-Fehler gegen ein festes Regelwerk: Title, Description, Canonical, Robots-Direktiven, Überschriften, robots.txt, Sitemap, Rendering, Statuscodes, Bilder, Links, hreflang, Open Graph, JSON-LD.",
+      "version": "0.1.0",
+      "category": "web",
+      "tags": ["seo", "technical-seo", "audit", "indexierung", "structured-data", "hreflang"],
+      "author": {
+        "name": "Lars Decker",
+        "url": "https://lars-decker.eu"
+      },
+      "homepage": "https://lars-decker.eu/skills/seo-check",
+      "repository": "https://github.com/larsdecker/agent-skills",
+      "license": "MIT"
+    },
+    {
+      "name": "seo-fix",
+      "source": "./skills/seo-fix",
+      "description": "Behebt technische SEO-Mängel im Code: Metadaten, Canonicals, Robots-Direktiven, Überschriftenstruktur, Bildattribute, hreflang, Open Graph und JSON-LD – framework-gerecht, nach Wirkung priorisiert, mit Gegenprobe.",
+      "version": "0.1.0",
+      "category": "web",
+      "tags": ["seo", "technical-seo", "metadata", "structured-data", "nextjs", "refactoring"],
+      "author": {
+        "name": "Lars Decker",
+        "url": "https://lars-decker.eu"
+      },
+      "homepage": "https://lars-decker.eu/skills/seo-fix",
+      "repository": "https://github.com/larsdecker/agent-skills",
+      "license": "MIT"
+    },
+    {
       "name": "geo-audit",
       "source": "./skills/geo-audit",
       "description": "Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen (ChatGPT, Perplexity, AI Overviews): Crawler-Zugang, llms.txt, Entity-Klarheit, Zitierfähigkeit – inklusive konkreter Fix-Liste.",

@@ -1,13 +1,17 @@
 # Agent Skills von Lars Decker
 
-Zwei Skills für Coding-Agenten an der Schnittstelle zwischen Produktarbeit und Entwicklung. Beide liefern belegbare Ergebnisse aus messbaren Signalen – keine Einschätzungen aus dem Bauch, keine erfundenen Zahlen.
+Skills für Coding-Agenten an der Schnittstelle zwischen Produktarbeit und Entwicklung. Alle liefern belegbare Ergebnisse aus messbaren Signalen – keine Einschätzungen aus dem Bauch, keine erfundenen Zahlen, und in jedem Skill eine ausdrückliche Liste dessen, was er **nicht** kann.
 
-Warum diese zwei: Die meisten veröffentlichten Skills helfen beim Schreiben von Code. Diese beiden helfen bei Entscheidungen **über** Code – Priorisierung, Begründung, Auffindbarkeit.
+Die meisten veröffentlichten Skills helfen beim Schreiben von Code. Diese helfen bei Entscheidungen **über** Code – Priorisierung, Begründung, Auffindbarkeit.
 
 | Skill | Was er tut |
 | :-- | :-- |
 | **tech-debt-ledger** | Erzeugt aus einem Git-Repository ein Tech-Debt-Register in Stakeholder-Sprache: Hotspots aus Churn × Größe, Änderungskopplung, Wissensrisiken, Testlücken – übersetzt in Risiko und kleinste wirksame Gegenmaßnahme. |
+| **seo-check** | Prüft eine Website gegen ein Regelwerk mit konkreten Schwellwerten: Title, Description, Canonical, Robots-Direktiven, Überschriften, robots.txt, Sitemap, Rendering, Statuscodes, Bilder, Links, hreflang, Open Graph, JSON-LD. |
+| **seo-fix** | Setzt die Befunde im Code um – framework-gerecht, nach Wirkung priorisiert, mit Gegenprobe. Trennt strikt zwischen mechanischen Fixes und inhaltlichen Entscheidungen. |
 | **geo-audit** | Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen: Retrieval-Crawler-Zugang, llms.txt, Entity-Klarheit über JSON-LD, Zitierfähigkeit der Absätze – mit konkreter Fix-Liste. |
+
+`seo-check` und `geo-audit` teilen sich das Thema Auffindbarkeit ohne Überschneidung: klassische Suche mit Ergebnisliste → `seo-check`. Formulierte Antwort mit Quellenangabe → `geo-audit`. Kein Skill prüft, was der andere prüft, damit keine widersprüchlichen Empfehlungen entstehen.
 
 ## Agentenunabhängig
 
@@ -50,6 +54,10 @@ node skills/tech-debt-ledger/scripts/scan-repo.mjs --since 12m --json
 ```
 
 ```bash
+node skills/seo-check/scripts/seo-scan.mjs --site https://example.com --max-pages 5
+```
+
+```bash
 node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
 ```
 
@@ -89,6 +97,22 @@ Ausgabe ist ein `TECH-DEBT.md`, das bei jedem Durchlauf fortgeschrieben wird: be
 
 **Was er bewusst nicht tut:** keine Aufwandsschätzung in Personentagen (das kann nur das Team), keine statische Codeanalyse (dafür gibt es ESLint und Sonar), keine Sicherheitsprüfung.
 
+## seo-check und seo-fix
+
+Zwei Skills für denselben Bereich, mit klarer Arbeitsteilung: `seo-check` findet und bewertet, `seo-fix` setzt um. Getrennt, weil Finden und Ändern unterschiedliche Rechte und unterschiedliche Vorsicht brauchen — ein Audit darf jederzeit laufen, eine Änderung an produktiven Weiterleitungen nicht.
+
+**Das Regelwerk** ist explizit und liegt offen: Schwellwerte für Title-Breite und -Länge, Description-Grenzen für Desktop und Mobil, Canonical-Fehlerbedingungen, gültige Robots-Direktiven und ihre Vorrangregeln, robots.txt-Gruppenisolierung, Sitemap-Limits, Statuscode-Behandlung, Bildgrößen und -attribute, hreflang-Codes, Open-Graph-Bildmaße und Pflichtfelder je Schema-Typ. Alle Werte stehen im Objekt `LIMITS` am Anfang des Scan-Scripts und in `references/rules.md` — mit Begründung und, wichtiger, mit der Angabe, **wann eine Regel nicht gilt**.
+
+Was diese beiden von einem generischen SEO-Werkzeug unterscheidet:
+
+- **Wirkungsreihenfolge statt Checklistenlänge.** Fünf Stufen von Indexierbarkeit bis Feinschliff. Ein perfekter Title auf einer Seite mit `noindex` ist wertlos — deshalb wird nie parallel gearbeitet.
+- **Lesbarkeit sprachrichtig gemessen.** Für deutschsprachige Seiten die Amstad-Variante der Flesch-Formel statt der englischen. Der oft zitierte Zielbereich 60–70 gilt für Englisch; deutsche Fachtexte liegen strukturell darunter, und ein Befund dagegen führt zu schlechterem Text. Auf Übersichts- und Rechtsseiten wird gar nicht gemessen.
+- **Vorlage statt Einzelseite.** Jeder Befund wird danach eingeordnet, ob er eine Seite oder eine Vorlage betrifft — der Unterschied zwischen fünf Minuten und fünf Tagen.
+- **Keine Punktzahl.** Ein „SEO-Score 78/100" suggeriert Messgenauigkeit, die nicht existiert, und lenkt von der Frage ab, welche zwei Dinge zuerst zu tun sind.
+- **Harte Grenzen in `seo-fix`.** Kein Entfernen von `noindex` ohne Rückfrage, kein Markup für nicht sichtbare Inhalte, keine erfundenen Bewertungen, keine `alt`-Texte für ungesehene Bilder, kein `dateModified` aus dem Deployment-Zeitpunkt. Die ersten drei sind Richtlinienverstöße mit Sanktionsrisiko, die letzten zwei entwerten Signale still.
+
+**Nicht messbar und deshalb ausdrücklich ausgewiesen:** Core Web Vitals (brauchen Browser oder Felddaten — der Scan meldet nur die bekannten Auslöser), Übereinstimmung mit der Suchintention, inhaltliche Tiefe, domainübergreifender Duplicate Content.
+
 ## geo-audit
 
 **Das Problem:** Antwortmaschinen zitieren Absätze, keine Seiten. Klassische SEO-Werkzeuge messen das nicht, weil sie auf Ranking optimieren – nicht auf Übernehmbarkeit einer Aussage.
@@ -114,6 +138,13 @@ skills/                              agentenneutrale Quelle
 │   ├── references/                  Taxonomie, Stakeholder-Sprache, Vorlage
 │   ├── scripts/scan-repo.mjs        Signalerhebung, abhängigkeitsfrei
 │   └── .claude-plugin/plugin.json   Metadaten für Claude Code
+├── seo-check/
+│   ├── SKILL.md
+│   ├── references/                  Regelwerk, Statuscodes, Schema-Pflichtfelder
+│   └── scripts/seo-scan.mjs
+├── seo-fix/
+│   ├── SKILL.md
+│   └── references/                  Wirkungsreihenfolge, Framework-Muster, Textregeln
 └── geo-audit/
     ├── SKILL.md
     ├── references/                  Kriterien, Crawler, llms.txt, Fix-Muster
