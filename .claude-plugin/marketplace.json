@@ -19,7 +19,7 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/tech-debt-ledger",
-      "repository": "https://github.com/larsdecker/agent-skills",
+      "repository": "https://github.com/larsdecker/agents-skills",
       "license": "MIT"
     },
     {
@@ -34,7 +34,7 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/seo-check",
-      "repository": "https://github.com/larsdecker/agent-skills",
+      "repository": "https://github.com/larsdecker/agents-skills",
       "license": "MIT"
     },
     {
@@ -49,7 +49,7 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/seo-fix",
-      "repository": "https://github.com/larsdecker/agent-skills",
+      "repository": "https://github.com/larsdecker/agents-skills",
       "license": "MIT"
     },
     {
@@ -64,7 +64,7 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/geo-audit",
-      "repository": "https://github.com/larsdecker/agent-skills",
+      "repository": "https://github.com/larsdecker/agents-skills",
       "license": "MIT"
     }
   ]

@@ -3,3 +3,6 @@ node_modules/
 *.log
 scan.json
 geo.json
+
+# Beispielausgaben bleiben lokal und gehoeren nicht ins Repository.
+examples/

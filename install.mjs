@@ -18,8 +18,8 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = path.dirname(fileURLToPath(import.meta.url));
 const skillsRoot = path.join(repoRoot, 'skills');
 
-const MARKER_START = '<!-- agent-skills:start -->';
-const MARKER_END = '<!-- agent-skills:end -->';
+const MARKER_START = '<!-- agents-skills:start -->';
+const MARKER_END = '<!-- agents-skills:end -->';
 
 /**
  * `payload`  Verzeichnis, in das die Skill-Dateien kopiert werden.
@@ -33,7 +33,7 @@ const AGENTS = {
     label: 'Claude Code',
     payload: (name) => `.claude/skills/${name}`,
     entry: null,
-    note: 'Alternativ als Plugin: /plugin marketplace add larsdecker/agent-skills',
+    note: 'Alternativ als Plugin: /plugin marketplace add larsdecker/agents-skills',
   },
   cursor: {
     label: 'Cursor',
@@ -184,7 +184,7 @@ function renderBlockSection(entries) {
     lines.push(`- **Scripts:** \`${payloadPath}/scripts/\` (Node ≥ 18, abhängigkeitsfrei)`);
     lines.push('');
   }
-  lines.push('Verwaltet von `install.mjs` aus https://github.com/larsdecker/agent-skills — Änderungen in diesem Abschnitt werden beim nächsten Lauf überschrieben.');
+  lines.push('Verwaltet von `install.mjs` aus https://github.com/larsdecker/agents-skills — Änderungen in diesem Abschnitt werden beim nächsten Lauf überschrieben.');
   lines.push('');
   lines.push(MARKER_END);
   return lines.join('\n');
