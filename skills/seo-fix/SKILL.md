@@ -122,5 +122,5 @@ Keine Erfolgsprognose. „Das behebt X" ist belegbar, „das verbessert das Rank
 
 - **Keine Inhaltserstellung.** Fehlender Inhalt ist kein SEO-Mangel, sondern offener Scope.
 - **Keine Keyword-Recherche.** Ohne Suchvolumendaten wäre jede Zielbegriff-Empfehlung geraten.
-- **Keine Performance-Optimierung.** Core Web Vitals verlangen Messung und Architekturarbeit. Dieser Skill behebt die auszeichnungsseitigen Auslöser — fehlende Bildabmessungen, lazy geladene Hero-Bilder — nicht die Ursachen im Bundle.
+- **Keine Performance-Optimierung im Bundle.** Dieser Skill behebt die auszeichnungsseitigen Auslöser — fehlende Bildabmessungen, lazy geladene Hero-Bilder. Ressourcengewicht, Render-Blocking-Ressourcen, Kompression und Ladestrategie gehören zu **`perf-budget-check`**/**`perf-budget-fix`**.
 - **Keine Änderungen an produktiven Weiterleitungen ohne ausdrückliche Freigabe.**

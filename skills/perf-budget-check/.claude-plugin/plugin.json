@@ -1,0 +1,14 @@
+{
+  "name": "perf-budget-check",
+  "displayName": "Perf Budget Check",
+  "version": "0.1.0",
+  "description": "Prüft eine Website gegen Performance-Budgets für Ressourcengewicht und Lade-Strategie, ohne echten Browser.",
+  "author": {
+    "name": "Lars Decker",
+    "url": "https://lars-decker.eu"
+  },
+  "homepage": "https://lars-decker.eu/skills/perf-budget-check",
+  "repository": "https://github.com/larsdecker/agents-skills",
+  "license": "MIT",
+  "keywords": ["performance", "core-web-vitals", "performance-budget", "lighthouse", "web-performance"]
+}

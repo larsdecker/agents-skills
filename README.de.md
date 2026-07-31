@@ -12,8 +12,10 @@ Die meisten veröffentlichten Skills helfen beim Schreiben von Code. Diese helfe
 | **seo-check** | Prüft eine Website gegen ein Regelwerk mit konkreten Schwellwerten: Title, Description, Canonical, Robots-Direktiven, Überschriften, robots.txt, Sitemap, Rendering, Statuscodes, Bilder, Links, hreflang, Open Graph, JSON-LD. |
 | **seo-fix** | Setzt die Befunde im Code um – framework-gerecht, nach Wirkung priorisiert, mit Gegenprobe. Trennt strikt zwischen mechanischen Fixes und inhaltlichen Entscheidungen. |
 | **geo-audit** | Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen: Retrieval-Crawler-Zugang, llms.txt, Entity-Klarheit über JSON-LD, Zitierfähigkeit der Absätze – mit konkreter Fix-Liste. |
+| **perf-budget-check** | Prüft eine Website gegen Performance-Budgets für Ressourcengewicht ohne echten Browser: JS/CSS/Bild-Bytes, Requests, Drittanbieter-Origins, Render-Blocking, Kompression, Cache-Header, Font-Ladestrategie, CI-Budget-Gate. |
+| **perf-budget-fix** | Setzt diese Befunde im Code um: Kompression, Render-Blocking entschärfen, Code-Splitting, Font-Ladestrategie, Drittanbieter-Ladestrategie, Caching, CI-Budget-Gate – framework-gerecht, mit Gegenprobe. |
 
-`seo-check` und `geo-audit` teilen sich das Thema Auffindbarkeit ohne Überschneidung: klassische Suche mit Ergebnisliste → `seo-check`. Formulierte Antwort mit Quellenangabe → `geo-audit`. Kein Skill prüft, was der andere prüft, damit keine widersprüchlichen Empfehlungen entstehen.
+`seo-check` und `geo-audit` teilen sich das Thema Auffindbarkeit ohne Überschneidung: klassische Suche mit Ergebnisliste → `seo-check`. Formulierte Antwort mit Quellenangabe → `geo-audit`. `perf-budget-check` deckt ein drittes, eigenes Thema ab: nicht ob eine Seite gefunden wird, sondern wie schwer sie lädt – und überschneidet sich bewusst nicht mit den bildbezogenen Befunden aus `seo-check`. Kein Skill prüft, was ein anderer prüft, damit keine widersprüchlichen Empfehlungen entstehen.
 
 ## Agentenunabhängig
 
@@ -61,6 +63,10 @@ node skills/seo-check/scripts/seo-scan.mjs --site https://example.com --max-page
 
 ```bash
 node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
+```
+
+```bash
+node skills/perf-budget-check/scripts/perf-scan.mjs https://example.com https://example.com/blog/artikel
 ```
 
 ### Claude Code als Plugin
@@ -131,6 +137,25 @@ Das Script führt nur GET-Anfragen aus, wartet zwischen Seiten und identifiziert
 
 **Was er bewusst nicht tut:** keine Messung tatsächlicher Sichtbarkeit. Ob ein Modell zitiert, hängt von Trainingsdaten, Index-Stand und Konkurrenz zur konkreten Frage ab – nichts davon ist von außen prüfbar. Der Audit prüft Voraussetzungen, nicht Ergebnisse. Wer eine Garantie verspricht, verkauft etwas anderes.
 
+## perf-budget-check und perf-budget-fix
+
+Ein Performance-Budget besteht aus zwei verschiedenen Dingen: nutzerzentrierten Metriken (LCP, INP, CLS, TBT), die einen echten Browser oder Felddaten brauchen, und Ressourcen-Budgets (KB JS/CSS/Bilder, Requestanzahl, Drittanbieter-Zahl), die sich aus HTTP-Antworten ableiten lassen. `perf-budget-check` misst ausschließlich die zweite Kategorie – und sagt bei jedem Befund, ob er eine der ersten Kategorie nur nahelegt oder tatsächlich beziffert.
+
+**Was der Skill misst:**
+
+- **Reale Transferbytes statt Content-Length.** Viele CDNs (Cloudflare, Vercel) streamen Brotli/Gzip ohne `Content-Length`-Header, auch auf `HEAD`. Der Scan zählt deshalb Bytes aus einem rohen, unkomprimierten GET über `node:http`/`node:https` selbst, statt sich auf einen Header zu verlassen, der oft fehlt.
+- **Render-Blocking-Ressourcen** – synchrone Scripts im `<head>` ohne `defer`/`async`/`module`, mehrere große synchrone Stylesheets.
+- **Kompression, Caching, Fonts, Resource Hints** – fehlendes `content-encoding`, kurzlebiges Caching auf gehashten Dateinamen, `@font-face` ohne `font-display`, fehlendes `preconnect` für Drittanbieter-Origins.
+- **Ein optionales CI-Budget-Gate** – sucht `lighthouserc.json` (oder Varianten) im aktuellen Arbeitsverzeichnis und meldet, wenn keins existiert oder es die zentralen Metriken nicht abdeckt.
+
+**Bewusste Abgrenzung zu `seo-check`:** Bildattribute (`width`/`height`, `loading="lazy"` auf dem ersten Bild) prüft `seo-check`, nicht dieser Skill – ein Bild-Tag hat sonst zwei Quellen für Befunde, die sich widersprechen könnten.
+
+`perf-budget-fix` setzt Befunde um: Kompression aktivieren, Render-Blocking entschärfen, Code-Splitting (mit Framework-Mustern für Next.js, Nuxt, Astro, SvelteKit, Vue, statische Seiten, WordPress, Edge-Umgebungen), Font-Ladestrategie, Drittanbieter-Skripte verzögern statt löschen, Caching-Header, `lighthouserc.json` anlegen. Harte Grenze: Drittanbieter-Skripte werden nie ohne Rückfrage entfernt, und Budget-Schwellwerte sind eine Team-Entscheidung, kein Ein-Zeilen-Fix.
+
+**Was beide bewusst nicht tun:** keine LCP/INP/CLS/TBT-Messung (dafür Lighthouse oder Felddaten), keine vollständige Request-Waterfall (nur was im initialen HTML referenziert ist), keine Erfolgsgarantie für echte Nutzererfahrung.
+
+Ausführlicher beschrieben: [Performance Budgets, die wirklich wirken](https://lars-decker.eu/blog/performance-budgets).
+
 ## Aufbau des Repositories
 
 ```
@@ -147,11 +172,18 @@ skills/                              agentenneutrale Quelle
 ├── seo-fix/
 │   ├── SKILL.md
 │   └── references/                  Wirkungsreihenfolge, Framework-Muster, Textregeln
-└── geo-audit/
+├── geo-audit/
+│   ├── SKILL.md
+│   ├── references/                  Kriterien, Crawler, llms.txt, Fix-Muster
+│   ├── scripts/geo-scan.mjs
+│   └── .claude-plugin/plugin.json
+├── perf-budget-check/
+│   ├── SKILL.md
+│   ├── references/                  Budget-Defaults, statische Signale und ihre Web-Vitals-Wirkung
+│   └── scripts/perf-scan.mjs
+└── perf-budget-fix/
     ├── SKILL.md
-    ├── references/                  Kriterien, Crawler, llms.txt, Fix-Muster
-    ├── scripts/geo-scan.mjs
-    └── .claude-plugin/plugin.json
+    └── references/                  Wirkungsreihenfolge, Framework-Muster, lighthouserc-Vorlage
 
 install.mjs                          Installation je Agent
 .claude-plugin/marketplace.json      Marketplace-Katalog für Claude Code
@@ -164,6 +196,7 @@ install.mjs                          Installation je Agent
 - [Technische Schulden sichtbar machen](https://lars-decker.eu/blog/tech-debt-sichtbar-machen)
 - [SEO ist nicht mehr genug: GEO](https://lars-decker.eu/blog/seo-ist-nicht-mehr-genug-geo)
 - [Wie ich mir mit KI-Skills den PO-Alltag leichter mache](https://lars-decker.eu/blog/ki-skills-fuer-product-owner)
+- [Performance Budgets, die wirklich wirken](https://lars-decker.eu/blog/performance-budgets)
 
 Übersicht und Details: [lars-decker.eu/skills](https://lars-decker.eu/skills)
 

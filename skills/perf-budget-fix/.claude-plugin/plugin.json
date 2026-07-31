@@ -1,0 +1,14 @@
+{
+  "name": "perf-budget-fix",
+  "displayName": "Perf Budget Fix",
+  "version": "0.1.0",
+  "description": "Setzt Performance-Budget-Befunde im Code um: Kompression, Render-Blocking, Code-Splitting, Fonts, Drittanbieter-Ladestrategie, Caching, CI-Budget-Gate.",
+  "author": {
+    "name": "Lars Decker",
+    "url": "https://lars-decker.eu"
+  },
+  "homepage": "https://lars-decker.eu/skills/perf-budget-fix",
+  "repository": "https://github.com/larsdecker/agents-skills",
+  "license": "MIT",
+  "keywords": ["performance", "core-web-vitals", "code-splitting", "lighthouse-ci", "nextjs"]
+}

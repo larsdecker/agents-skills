@@ -1,7 +1,7 @@
 {
   "name": "lars-decker",
-  "description": "Agent Skills für Product Owner mit Entwickler-Background: technische Schulden sichtbar machen und Websites für KI-Antwortmaschinen auffindbar machen. Nutzbar in Claude Code und anderen Coding-Agenten.",
-  "version": "0.2.0",
+  "description": "Agent Skills für Product Owner mit Entwickler-Background: technische Schulden sichtbar machen, Websites für KI-Antwortmaschinen auffindbar machen und Performance-Budgets gegen Ressourcengewicht durchsetzen. Nutzbar in Claude Code und anderen Coding-Agenten.",
+  "version": "0.3.0",
   "owner": {
     "name": "Lars Decker",
     "email": "decker@ascora.de"
@@ -64,6 +64,36 @@
         "url": "https://lars-decker.eu"
       },
       "homepage": "https://lars-decker.eu/skills/geo-audit",
+      "repository": "https://github.com/larsdecker/agents-skills",
+      "license": "MIT"
+    },
+    {
+      "name": "perf-budget-check",
+      "source": "./skills/perf-budget-check",
+      "description": "Prüft eine Website gegen Performance-Budgets für Ressourcengewicht und Lade-Strategie ohne echten Browser: JS/CSS/Bild-Bytes, Requests, Drittanbieter-Origins, Render-Blocking, Kompression, Cache-Header, Font-Ladestrategie, CI-Budget-Gate.",
+      "version": "0.1.0",
+      "category": "web",
+      "tags": ["performance", "core-web-vitals", "performance-budget", "lighthouse", "web-performance"],
+      "author": {
+        "name": "Lars Decker",
+        "url": "https://lars-decker.eu"
+      },
+      "homepage": "https://lars-decker.eu/skills/perf-budget-check",
+      "repository": "https://github.com/larsdecker/agents-skills",
+      "license": "MIT"
+    },
+    {
+      "name": "perf-budget-fix",
+      "source": "./skills/perf-budget-fix",
+      "description": "Setzt Performance-Budget-Befunde im Code um: Kompression, Render-Blocking entschärfen, Code-Splitting, Font-Ladestrategie, Drittanbieter-Ladestrategie, Caching, CI-Budget-Gate – framework-gerecht, nach Wirkung priorisiert, mit Gegenprobe.",
+      "version": "0.1.0",
+      "category": "web",
+      "tags": ["performance", "core-web-vitals", "code-splitting", "lighthouse-ci", "nextjs"],
+      "author": {
+        "name": "Lars Decker",
+        "url": "https://lars-decker.eu"
+      },
+      "homepage": "https://lars-decker.eu/skills/perf-budget-fix",
       "repository": "https://github.com/larsdecker/agents-skills",
       "license": "MIT"
     }

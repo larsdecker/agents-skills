@@ -14,8 +14,10 @@ Most published skills help you write code. These help with decisions **about** c
 | **seo-check** | Audits a website against a rule set with concrete thresholds: title, description, canonical, robots directives, headings, robots.txt, sitemap, rendering, status codes, images, links, hreflang, Open Graph, JSON-LD. |
 | **seo-fix** | Implements those findings in the codebase — framework-aware, ordered by impact, with a verification pass. Draws a hard line between mechanical fixes and editorial decisions. |
 | **geo-audit** | Checks whether a site can appear in AI answer engines: retrieval crawler access, llms.txt, entity clarity via JSON-LD, quotability at paragraph level — with a concrete fix list. |
+| **perf-budget-check** | Audits a site against performance budgets for resource weight without a real browser: JS/CSS/image bytes, requests, third-party origins, render-blocking resources, compression, cache headers, font loading strategy, CI budget gate. |
+| **perf-budget-fix** | Implements those findings in the codebase: compression, render-blocking mitigation, code splitting, font loading strategy, third-party loading strategy, caching, CI budget gate — framework-aware, with a verification pass. |
 
-`seo-check` and `geo-audit` share the topic of discoverability without overlapping: classic search with a result list → `seo-check`. A composed answer with cited sources → `geo-audit`. Neither checks what the other checks, so they can't produce contradictory advice.
+`seo-check` and `geo-audit` share the topic of discoverability without overlapping: classic search with a result list → `seo-check`. A composed answer with cited sources → `geo-audit`. `perf-budget-check` covers a third, separate topic: not whether a page is found, but how heavy it is to load — and deliberately does not overlap with the image-level findings in `seo-check`. No skill checks what another already checks, so they can't produce contradictory advice.
 
 ## Agent-agnostic by design
 
@@ -63,6 +65,10 @@ node skills/seo-check/scripts/seo-scan.mjs --site https://example.com --max-page
 
 ```bash
 node skills/geo-audit/scripts/geo-scan.mjs --site https://example.com --max-pages 5
+```
+
+```bash
+node skills/perf-budget-check/scripts/perf-scan.mjs https://example.com https://example.com/blog/article
 ```
 
 ### Claude Code as a plugin
@@ -129,6 +135,25 @@ The script issues GET requests only, waits between pages, and identifies itself 
 
 **What it deliberately does not do:** no measurement of actual visibility. Whether a model cites you depends on training data, index state and competition for the specific question — none of which is observable from outside. The audit checks preconditions, not outcomes. Anyone promising a guarantee is selling something else.
 
+## perf-budget-check and perf-budget-fix
+
+A performance budget is really two different things: user-centric metrics (LCP, INP, CLS, TBT), which need a real browser or field data, and resource budgets (KB of JS/CSS/images, request count, third-party count), which are derivable from HTTP responses alone. `perf-budget-check` measures only the second category — and states for every finding whether it merely correlates with the first or actually quantifies it.
+
+**What the skill measures:**
+
+- **Real transfer bytes instead of Content-Length.** Many CDNs (Cloudflare, Vercel) stream Brotli/Gzip without a `Content-Length` header, on HEAD or GET alike. The scan counts bytes from a raw, undecompressed GET over `node:http`/`node:https` itself instead of trusting a header that is frequently absent.
+- **Render-blocking resources** — synchronous head scripts without `defer`/`async`/`module`, multiple large synchronous stylesheets.
+- **Compression, caching, fonts, resource hints** — missing `content-encoding`, short-lived caching on hashed filenames, `@font-face` without `font-display`, missing `preconnect` for third-party origins.
+- **An optional CI budget gate** — looks for `lighthouserc.json` (or variants) in the current working directory and flags when none exists or it doesn't cover the core metrics.
+
+**Deliberate boundary with `seo-check`:** image attributes (`width`/`height`, `loading="lazy"` on the first image) are `seo-check`'s job, not this skill's — otherwise one image tag would have two sources of findings that could contradict each other.
+
+`perf-budget-fix` implements findings: enabling compression, mitigating render-blocking resources, code splitting (with framework patterns for Next.js, Nuxt, Astro, SvelteKit, Vue, static sites, WordPress, edge environments), font loading strategy, deferring third-party scripts instead of deleting them, cache headers, scaffolding `lighthouserc.json`. Hard limit: third-party scripts are never removed without asking, and budget thresholds are a team decision, not a one-line fix.
+
+**What neither does:** no LCP/INP/CLS/TBT measurement (that needs Lighthouse or field data), no full request waterfall (only what the initial HTML references), no guarantee about actual user experience.
+
+Written up in more detail (in German): [Performance budgets that actually work](https://lars-decker.eu/blog/performance-budgets).
+
 ## Repository layout
 
 ```
@@ -145,10 +170,17 @@ skills/                              agent-neutral source of truth
 ├── seo-fix/
 │   ├── SKILL.md
 │   └── references/                  impact order, framework patterns, copy rules
-└── geo-audit/
+├── geo-audit/
+│   ├── SKILL.md
+│   ├── references/                  criteria, crawlers, llms.txt, fix patterns
+│   └── scripts/geo-scan.mjs
+├── perf-budget-check/
+│   ├── SKILL.md
+│   ├── references/                  budget defaults, static signals and their web-vitals effect
+│   └── scripts/perf-scan.mjs
+└── perf-budget-fix/
     ├── SKILL.md
-    ├── references/                  criteria, crawlers, llms.txt, fix patterns
-    └── scripts/geo-scan.mjs
+    └── references/                  impact order, framework patterns, lighthouserc template
 
 install.mjs                          per-agent installation
 .claude-plugin/marketplace.json      marketplace catalogue for Claude Code
@@ -175,6 +207,7 @@ Written up in more detail (in German):
 - [Making technical debt visible](https://lars-decker.eu/blog/tech-debt-sichtbar-machen)
 - [SEO is no longer enough: GEO](https://lars-decker.eu/blog/seo-ist-nicht-mehr-genug-geo)
 - [How I use AI skills to simplify product owner work](https://lars-decker.eu/blog/ki-skills-fuer-product-owner)
+- [Performance budgets that actually work](https://lars-decker.eu/blog/performance-budgets)
 
 Overview and details: [lars-decker.eu/skills](https://lars-decker.eu/skills)
 

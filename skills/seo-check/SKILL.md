@@ -92,7 +92,7 @@ Diese Punkte entscheiden über den Wert des Audits und sind nicht automatisierba
 
 **Stimmen strukturierte Daten mit dem sichtbaren Inhalt überein?** Das ist die einzige Prüfung mit echtem Abmahnrisiko: Markup für Inhalte, die auf der Seite nicht sichtbar sind, und Bewertungen ohne echte Rezensionen sind Richtlinienverstöße und können eine manuelle Maßnahme auslösen. Wenn du so etwas findest, melde es als schwersten Befund des Berichts, unabhängig von der Einstufung des Scans.
 
-**Core Web Vitals.** Das Script misst sie nicht — dafür braucht es einen echten Browser oder Felddaten. Es meldet nur bekannte Auslöser wie fehlende Bildabmessungen. Verweise für die Messung auf PageSpeed Insights oder die Search Console und nenne die Schwellwerte aus `references/rules.md`, damit die Zahlen einzuordnen sind.
+**Core Web Vitals.** Das Script misst sie nicht — dafür braucht es einen echten Browser oder Felddaten. Es meldet nur bekannte bildbezogene Auslöser wie fehlende Bildabmessungen. Für Ressourcengewicht, Render-Blocking-Ressourcen, Kompression und ein CI-Budget-Gate ist der Skill **`perf-budget-check`** zuständig. Verweise für die eigentliche Messung zusätzlich auf PageSpeed Insights oder die Search Console.
 
 ### Schritt 5: Bericht
 
