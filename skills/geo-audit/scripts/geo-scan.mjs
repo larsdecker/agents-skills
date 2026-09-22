@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * geo-scan.mjs — prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen.
+ * geo-scan.mjs — erhebt technische Readiness-Signale für GEO-Audits.
  *
  * Führt ausschließlich lesende HTTP-Anfragen aus (GET). Verändert nichts.
  * Keine Abhängigkeiten. Node >= 18 (nutzt globales fetch).
@@ -18,8 +18,8 @@ const POLITENESS_DELAY_MS = 400;
 
 /**
  * KI-Crawler, unterteilt nach Zweck. Die Unterscheidung ist entscheidend:
- * ein Retrieval-Bot zu blockieren kostet Sichtbarkeit in Antworten,
- * einen Training-Bot zu blockieren kostet sie nicht.
+ * ein Retrieval-Bot in robots.txt auszuschließen kann den Abruf verhindern;
+ * tatsächlichen Zugriff des Anbieters belegt dieser Check nicht.
  */
 const AI_AGENTS = [
   { name: 'OAI-SearchBot', vendor: 'OpenAI', purpose: 'retrieval', impact: 'hoch' },
@@ -499,7 +499,7 @@ function analyzeLlmsTxt(response) {
 
 function buildFindings(result) {
   const findings = [];
-  const add = (severity, area, text, fix) => findings.push({ severity, area, text, fix });
+  const add = (severity, area, text, fix) => findings.push({ severity, evidence: 'OBSERVED', area, text, fix });
 
   // Zugang
   for (const agent of result.site.crawlers) {
@@ -507,7 +507,7 @@ function buildFindings(result) {
     if (agent.impact === 'kritisch' || agent.impact === 'hoch') {
       add('kritisch', 'Zugang',
         `${agent.name} (${agent.vendor}, ${agent.purpose}) ist per robots.txt ausgeschlossen (${agent.rule || agent.source}).`,
-        'Regel entfernen. Dieser Bot holt Inhalte für Antworten ab — ohne Zugang kann die Seite dort nicht auftauchen.');
+        'Prüfen, ob der Ausschluss beabsichtigt ist. robots.txt zeigt die veröffentlichte Crawl-Regel, nicht den tatsächlichen Zugriff des Anbieter-Crawlers.');
     }
   }
   if (!result.site.robots.present) {
@@ -520,29 +520,32 @@ function buildFindings(result) {
 
   // llms.txt
   if (!result.site.llmsTxt.present) {
-    add('mittel', 'Auffindbarkeit', 'Keine llms.txt vorhanden.',
-      'Datei unter /llms.txt anlegen: kurze Beschreibung der Site plus kommentierte Linkliste der wichtigsten Seiten.');
+    add('experimentell', 'Auffindbarkeit', 'Keine llms.txt vorhanden.',
+      'Nur als klar gekennzeichnetes Experiment erwägen; sie ist keine Voraussetzung für GEO-Sichtbarkeit.');
   } else {
     if (!result.site.llmsTxt.hasH1) {
-      add('mittel', 'Auffindbarkeit', 'llms.txt hat keine H1-Überschrift.', 'Mit "# <Name der Site>" beginnen.');
+      add('experimentell', 'Auffindbarkeit', 'llms.txt hat keine H1-Überschrift.', 'Nur relevant, falls das experimentelle Dateiformat bewusst genutzt wird.');
     }
     if (!result.site.llmsTxt.hasBlockquoteSummary) {
-      add('hinweis', 'Auffindbarkeit', 'llms.txt hat keine Kurzbeschreibung als Blockquote.',
-        'Nach der H1 eine Zeile "> <ein Satz, worum es geht>" einfügen.');
+      add('experimentell', 'Auffindbarkeit', 'llms.txt hat keine Kurzbeschreibung als Blockquote.',
+        'Nur relevant, falls das experimentelle Dateiformat bewusst genutzt wird.');
     }
     if (result.site.llmsTxt.linkCount === 0) {
-      add('mittel', 'Auffindbarkeit', 'llms.txt enthält keine Links.',
-        'Wichtigste Seiten als Markdown-Links mit je einer erklärenden Zeile aufnehmen.');
+      add('experimentell', 'Auffindbarkeit', 'llms.txt enthält keine Links.',
+        'Nur relevant, falls das experimentelle Dateiformat bewusst genutzt wird.');
     }
   }
   if (!result.site.sitemap.present) {
-    add('mittel', 'Auffindbarkeit', 'Keine sitemap.xml erreichbar.', 'Sitemap generieren und in robots.txt verlinken.');
+    add('hinweis', 'Auffindbarkeit', 'Keine sitemap.xml erreichbar.', 'Bei einer größeren oder schwer intern auffindbaren Site eine Sitemap veröffentlichen und aktuell halten.');
   }
 
   // Seitenebene
   for (const page of result.pages) {
     if (!page.ok) {
-      add('kritisch', 'Zugang', `${page.url} nicht abrufbar (${page.error}).`, 'Erreichbarkeit prüfen.');
+      add(page.status === 0 ? 'hinweis' : 'kritisch', 'Zugang', `${page.url} im Scan nicht abrufbar (${page.error}).`,
+        page.status === 0
+          ? 'Netzwerk, DNS, TLS und lokale Ausführungsumgebung prüfen; dieser Fehler belegt nicht allein, dass die Website für Anbieter-Crawler unerreichbar ist.'
+          : 'Erreichbarkeit und mögliche Netzwerk-, CDN- oder WAF-Regeln prüfen.');
       continue;
     }
     const label = new URL(page.url).pathname || '/';
@@ -552,16 +555,16 @@ function buildFindings(result) {
     const isProse = page.pageKind === 'artikel';
 
     if (page.structuredData.blockCount === 0) {
-      add('kritisch', 'Entity-Klarheit', `${label}: keine JSON-LD-Strukturdaten.`,
-        'Mindestens WebPage plus Person oder Organization ergänzen, damit maschinell klar ist, wer hier spricht.');
+      add('opportunity', 'Entity-Klarheit', `${label}: keine JSON-LD-Strukturdaten.`,
+        'Nur ergänzen, wenn strukturierte Daten konkrete, sichtbare Inhalte korrekt abbilden; fehlendes JSON-LD ist kein GEO-Blocker.');
     } else {
       if (page.structuredData.parseErrors.length > 0) {
-        add('kritisch', 'Entity-Klarheit', `${label}: JSON-LD ist nicht parsebar (${page.structuredData.parseErrors[0]}).`,
-          'Syntaxfehler beheben — fehlerhaftes JSON-LD wird komplett ignoriert.');
+        add('opportunity', 'Entity-Klarheit', `${label}: JSON-LD ist nicht parsebar (${page.structuredData.parseErrors[0]}).`,
+          'Syntax korrigieren, wenn die Seite auf dieses Markup angewiesen ist; sichtbare Inhalte separat bewerten.');
       }
       if (!page.structuredData.hasPersonOrOrganization) {
-        add('mittel', 'Entity-Klarheit', `${label}: keine Person- oder Organization-Entität.`,
-          'Autor beziehungsweise Betreiber als eigene Entität auszeichnen und per @id auf allen Seiten identisch referenzieren.');
+        add('opportunity', 'Entity-Klarheit', `${label}: keine Person- oder Organization-Entität.`,
+          'Sichtbare Angaben zu Autor und Betreiber auf Klarheit und Konsistenz prüfen; Markup nur bei passendem Inhalt erwägen.');
       }
       if (page.structuredData.entityCount > 1 && page.structuredData.withId === 0) {
         add('mittel', 'Entity-Klarheit', `${label}: ${page.structuredData.entityCount} Entitäten ohne @id.`,
@@ -569,7 +572,7 @@ function buildFindings(result) {
       }
       if (!page.structuredData.dateModified) {
         add('hinweis', 'Aktualität', `${label}: kein dateModified in den Strukturdaten.`,
-          'dateModified ergänzen — Aktualität ist ein Auswahlkriterium bei Antworten.');
+          'Nur bei tatsächlich zeitabhängigem Inhalt ein echtes Änderungsdatum sichtbar und gegebenenfalls im Markup ausweisen.');
       }
     }
 
@@ -581,13 +584,13 @@ function buildFindings(result) {
     }
 
     if (isProse && page.words > 400 && page.headings.questionHeadings.length === 0) {
-      add('mittel', 'Struktur', `${label}: keine Überschrift im Frageformat.`,
-        'Mindestens zwei Abschnitte als Frage formulieren, die Nutzer tatsächlich stellen — Antwortmaschinen matchen auf Fragen.');
+      add('hinweis', 'Struktur', `${label}: keine Überschrift im Frageformat.`,
+        'Nur prüfen, ob Überschriften die tatsächliche Nutzerintention klar wiedergeben; Frageform ist keine Pflicht.');
     }
 
     if (isProse && page.words > 400 && page.extractableStructures.lists + page.extractableStructures.tables === 0) {
       add('hinweis', 'Struktur', `${label}: keine Listen oder Tabellen.`,
-        'Vergleiche und Aufzählungen als Liste oder Tabelle auszeichnen — strukturierte Blöcke werden bevorzugt übernommen.');
+        'Listen oder Tabellen nur dort erwägen, wo Inhalte ihrer Natur nach Aufzählungen oder Vergleiche sind.');
     }
 
     if (isProse && page.quotability.contextDependentShare >= 30) {
@@ -625,7 +628,7 @@ function buildFindings(result) {
     }
   }
 
-  const order = { kritisch: 0, mittel: 1, hinweis: 2 };
+  const order = { kritisch: 0, opportunity: 1, mittel: 2, hinweis: 3, experimentell: 4 };
   findings.sort((a, b) => order[a.severity] - order[b.severity]);
   return findings;
 }
@@ -729,11 +732,11 @@ function renderText(result) {
 
   lines.push('KI-CRAWLER-ZUGANG (robots.txt)');
   if (!result.site.robots.present) {
-    lines.push('  keine robots.txt gefunden — damit ist technisch alles erlaubt');
+    lines.push('  keine robots.txt gefunden — keine robots.txt-Einschränkung erkannt');
   }
   const blocked = result.site.crawlers.filter((agent) => !agent.allowed);
   if (blocked.length === 0) {
-    lines.push('  alle geprüften Agenten haben Zugang zu "/"');
+    lines.push('  robots.txt erlaubt den geprüften Agenten "/"; tatsächlicher Anbieterzugriff ist damit nicht belegt');
   } else {
     for (const agent of blocked) {
       lines.push(`  BLOCKIERT  ${pad(agent.name, 20)} ${agent.vendor} · ${agent.purpose} · Auswirkung: ${agent.impact}`);

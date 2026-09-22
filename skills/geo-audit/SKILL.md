@@ -1,130 +1,119 @@
 ---
 name: geo-audit
-description: Prüft eine Website auf Auffindbarkeit in KI-Antwortmaschinen (ChatGPT, Perplexity, Claude, Google AI Overviews) und liefert eine konkrete Fix-Liste. Nutze diesen Skill, wenn es um Generative Engine Optimization, llms.txt, KI-Crawler-Zugang, Sichtbarkeit in KI-Antworten oder darum geht, warum eine Seite in KI-Antworten nicht auftaucht oder falsch zitiert wird.
-when_to_use: "Auslöser sind unter anderem: GEO, Generative Engine Optimization, AI Search Optimization, llms.txt erstellen oder prüfen, ChatGPT findet meine Seite nicht, in Perplexity sichtbar werden, AI Overviews, KI-Crawler blockieren oder erlauben, GPTBot, ClaudeBot, PerplexityBot, robots.txt für KI-Bots, strukturierte Daten für KI, zitierfähige Inhalte, Entity SEO, wie werde ich von KI zitiert."
+description: Prüft GEO Readiness, tatsächliche KI-Sichtbarkeit und Chancen einer Website. Nutze den Skill für GEO- und AI-Search-Audits, KI-Crawler-Zugang, Zitierfähigkeit, AI-Citations, llms.txt und Fragen dazu, warum eine Website in KI-Antworten fehlt oder falsch dargestellt wird.
+when_to_use: "Auslöser sind unter anderem: GEO, Generative Engine Optimization, AI Search Optimization, KI-Sichtbarkeit, AI Citations, ChatGPT Search, Perplexity, Claude, Google AI Overviews, Bing AI Performance, KI-Crawler, zitierfähige Inhalte und Entity Trust."
 argument-hint: "[url oder domain] [optional: --max-pages 5]"
 allowed-tools: Read Grep Glob
 ---
 
 # GEO Audit
 
-Prüfe, ob eine Website für KI-Antwortmaschinen auffindbar, verständlich und zitierfähig ist – und liefere eine Fix-Liste, die nach Wirkung sortiert ist.
+Prüfe, ob eine Website technisch als Quelle verfügbar ist, relevante Fragen überzeugend beantwortet, tatsächlich in KI-Antworten erscheint und daraus geschäftlicher Nutzen entsteht. GEO ist kein Bündel KI-spezifischer SEO-Tricks.
 
-## Warum das nicht dasselbe wie SEO ist
+Trenne diese Ebenen in dieser Reihenfolge:
 
-Klassische Suche liefert eine Liste von Links. Der Nutzer klickt und liest selbst. Optimiert wird auf Position.
+1. **Eligibility** – darf und kann ein System Inhalte abrufen?
+2. **Retrieval** – sind wichtige Inhalte technisch verfügbar und auffindbar?
+3. **Understanding** – sind Thema, Absicht und Entitäten klar?
+4. **Citeability** – können zentrale Passagen allein verständlich und belegbar zitiert werden?
+5. **Trust & Evidence** – gibt es nachvollziehbare Erfahrung, Belege und klare Urheberschaft?
+6. **Observed Visibility** – wird die Website tatsächlich erwähnt oder zitiert?
+7. **Business Relevance** – entstehen Besuche, Leads oder Umsatz?
 
-Eine Antwortmaschine liefert eine formulierte Antwort und nennt Quellen. Sie klickt nicht, sie **übernimmt Textausschnitte**. Daraus folgen drei Unterschiede, die die gesamte Prüfung bestimmen:
+Technische Blocker haben Vorrang. Wenn ein relevanter Retrieval-Zugriff scheitert, priorisiere keine Satzstil-Empfehlungen.
 
-**Erstens: die Einheit ist der Absatz, nicht die Seite.** Ein Modell zitiert selten eine ganze Seite, sondern einzelne Aussagen. Ein Absatz, der mit „Das führt dazu, dass …" beginnt, ist außerhalb seines Kontexts unbrauchbar und wird nicht übernommen – egal wie gut die Seite rankt.
+## Audit-Modus wählen
 
-**Zweitens: Eindeutigkeit schlägt Keyword-Abdeckung.** Das Modell muss entscheiden, ob dein Inhalt zur Frage passt und wer ihn verantwortet. Widersprüchliche oder fehlende Entitätsangaben sind hier schädlicher als ein fehlendes Keyword.
+Wähle den kleinsten Modus, der die Anfrage beantwortet.
 
-**Drittens: Zugang ist binär.** Bei klassischem SEO ist schlechte Auffindbarkeit ein Gradient. Bei Antwortmaschinen ist ein blockierter Retrieval-Crawler ein hartes Aus. Deshalb steht diese Prüfung an erster Stelle.
+### GEO Readiness
 
-Sage das dem Nutzer, wenn er GEO als „SEO für KI" versteht – sonst erwartet er Rankings, wo es um Zitierbarkeit geht.
+Standard, wenn nur eine Website oder URL gegeben ist. Prüfe technische Verfügbarkeit, Crawlerzugriff, Inhalte im ausgelieferten HTML, Seitenstruktur, Suchintention, Zitierfähigkeit, Belege und Entity-Klarheit. Behaupte nicht, Readiness beweise tatsächliche Sichtbarkeit.
 
-## Ablauf
+### GEO Visibility
 
-### Schritt 1: Ziel bestimmen
+Verwenden, wenn gefragt wird, ob Marke oder Domain in KI-Antworten tatsächlich auftaucht. Prüfe verfügbare Citations, Marken-Erwähnungen, zitierte URLs, Grounding Queries, Themen, Intents, Citation Share und Wettbewerberquellen. Bevorzuge gemessene Plattformdaten gegenüber manuellen Prompt-Stichproben.
 
-Kläre, was geprüft werden soll:
+### Full GEO Audit
 
-- **Live-Website**: Domain oder einzelne URLs. Das ist der Normalfall und liefert die belastbarsten Ergebnisse, weil du siehst, was ein Crawler tatsächlich ausgeliefert bekommt.
-- **Lokales Projekt vor dem Deployment**: Wenn kein Live-Stand existiert, arbeite auf dem Repository. Dann prüfst du Templates, Strukturdaten-Erzeugung und Routen statt gerenderter Seiten – und sagst klar, dass die Zitierfähigkeit des Inhalts so nicht bewertbar ist.
+Readiness und Visibility zusammen mit einer Gap- und Chancenanalyse. Dies ist der passende Modus für eine strategische Gesamtanalyse.
 
-Frage nach dem **Ziel der Sichtbarkeit**, wenn es nicht aus dem Gespräch hervorgeht: Soll die Seite als Quelle für Fachfragen dienen, als Nachweis für eine Person oder Firma (Entity), oder für Produktvergleiche? Die Antwort verschiebt die Priorisierung der Befunde erheblich.
+## 1. Ziel und Fragen bestimmen
 
-### Schritt 2: Scan ausführen
+Bestimme, soweit verfügbar: Domain, Markt und Sprache, Produkt/Dienstleistung/Entität, Zielgruppe sowie relevante kommerzielle und informative Themen. Erfinde keine Keywords. Ermittle zuerst die Fragen, für die die Organisation als hilfreiche Quelle gelten möchte. Falls Ziel oder Zielgruppe unklar und für die Priorisierung entscheidend ist, frage gezielt nach.
 
-Das Script liegt neben dieser Datei unter `scripts/geo-scan.mjs`:
+Erstelle eine kleine repräsentative Fragenmenge und ordne sie Intents zu: informational, learn and solve, comparison, commercial, research, navigational oder planning. Details: `references/prompt-intent-framework.md`.
+
+## 2. Technische Readiness
+
+Führe den Scanner aus:
 
 ```bash
 node scripts/geo-scan.mjs --site https://example.com --max-pages 5
 ```
 
-Einzelne Seiten prüfen:
+Für einzelne Seiten:
 
 ```bash
 node scripts/geo-scan.mjs https://example.com/artikel-a https://example.com/artikel-b
 ```
 
-Den passenden Pfad bestimmen:
+Wichtige Optionen: `--max-pages <n>`, `--json`, `--out <datei>`. Das Script nutzt GET-Anfragen, ist abhängigkeitsfrei und verändert nichts; nur ein ausdrücklich angegebenes `--out` schreibt eine Datei. Führe es mit dem Pfad relativ zu diesem Skill-Verzeichnis aus. Bei unbekanntem Pfad suche `geo-scan.mjs`, statt Pfade zu raten.
 
-- **Claude Code als Plugin:** `node "${CLAUDE_PLUGIN_ROOT}/scripts/geo-scan.mjs" --site …`
-- **Andere Agenten oder manuelle Installation:** relativ zum Verzeichnis dieser `SKILL.md`. Übliche Orte sind `.agents/skills/geo-audit/`, `.claude/skills/geo-audit/` oder ein Checkout des Repositories.
-- **Pfad unbekannt:** im Projekt nach `geo-scan.mjs` suchen, statt zu raten.
+Wähle Seiten bewusst: Startseite, Entity-/Über-Seite sowie zwei bis drei Seiten, die wichtige Fragen beantworten. Der Scanner erhebt ausgewählte Signale zu HTTP-Abruf, robots.txt, Sitemap, Seitenstruktur und Inhalten im initialen HTML. Ergänze die manuelle Prüfung um Meta-Robots, X-Robots-Tag, `noindex`, Canonical-Ziele, Weiterleitungen und interne Auffindbarkeit; diese Punkte deckt der Scanner nicht vollständig ab. Unterscheide `robots.txt erlaubt` von `Abruf tatsächlich erfolgreich`; ein Abruf aus deiner Umgebung beweist keinen Anbieterzugriff und CDN-/WAF-Blockaden sind damit nicht ausgeschlossen. Siehe `references/technical-readiness.md` und `references/ai-crawlers.md`.
 
-| Option | Wirkung |
-| :-- | :-- |
-| `--site <url>` | Origin für Site-Prüfungen; zieht Seiten aus der Sitemap |
-| `--max-pages <n>` | Obergrenze geprüfter Seiten (Standard: 5) |
-| `--json` | JSON zusätzlich zur Textzusammenfassung |
-| `--out <datei>` | JSON in Datei schreiben |
+Google zufolge gibt es für AI Overviews und AI Mode keine separaten GEO-Markups oder Spezialdateien. Zugänglichkeit, Indexierbarkeit und hilfreicher Text bleiben zentral. Verwechsle Training-Crawler nicht mit Retrieval-Crawlern. Ein ausgeschlossener Training-Crawler ist ohne andere Evidenz kein Sichtbarkeits-Blocker.
 
-Das Script führt ausschließlich GET-Anfragen aus, wartet zwischen den Seiten und identifiziert sich mit eigenem User-Agent. Es verändert nichts.
+## 3. Inhalt, Intent und Zitierfähigkeit
 
-**Wähle die Seiten bewusst.** Fünf gut gewählte Seiten sind aussagekräftiger als fünfzig zufällige: die Startseite, eine Entity-Seite (Über/Impressum), und zwei bis drei inhaltliche Seiten, die tatsächlich Fragen beantworten. Übersichtsseiten liefern für die Inhaltsprüfung wenig – der Scan erkennt sie und wendet Prosa-Kriterien dort nicht an.
+Lies repräsentative Seiten selbst. Halte je wichtiger Seite fest:
 
-### Schritt 3: Befunde einordnen
+- Kernthema, Hauptintent und primäre Nutzerfrage
+- ergänzende Fragen und erwarteter Antworttyp
+- ob und wo die Seite diese Fragen tatsächlich beantwortet
+- ob der wichtige Inhalt im HTML vorhanden und intern auffindbar ist
 
-Der Scan liefert Befunde in drei Stufen. Deine Aufgabe ist nicht, sie weiterzugeben, sondern sie zu **gewichten und zu begründen**.
+Prüfe die drei bis fünf wichtigsten Passagen qualitativ auf Vollständigkeit der Antwort, eigenständigen Kontext, Spezifität, Belege, Geltungsbereich und Grenzen, Aktualität sowie Attribution. Verweise wie „Das zeigt …“ sind ein Prüfsignal, aber keine automatische Fehlerklasse. Satzlänge, Frageüberschriften und Listen sind ebenfalls nur Kontextsignale.
 
-**`kritisch`** blockiert Sichtbarkeit vollständig. Fast immer entweder ein ausgeschlossener Retrieval-Crawler oder fehlende beziehungsweise fehlerhafte Strukturdaten. Diese Punkte gehören zuerst behandelt und brauchen keine weitere Priorisierungsdiskussion.
+Niemals Inhalte allein umschreiben, damit sie „KI-optimiert“ klingen. Nicht jede Überschrift muss eine Frage sein. Keine beliebigen Absatz- oder Satzlängen vorschreiben und gute Prosa nicht für vermeintliche KI-Lesbarkeit zerschneiden. Änderungen müssen Verständnis, Belegbarkeit oder Informationswert verbessern. Details: `references/content-citeability.md` und `references/fix-patterns.md`.
 
-**`mittel`** verringert die Wahrscheinlichkeit, als Quelle gewählt zu werden.
+## 4. Original Evidence, Vertrauen und Entitäten
 
-**`hinweis`** ist Feinschliff. Melde diese Punkte gesammelt, nicht einzeln ausformuliert – sonst erscheint die Liste länger als das Problem.
+Suche nach originären Daten, Tests, Messungen, Beispielen, Screenshots, Benchmarks, Fallstudien, Methodik, belegter Expertenerfahrung, Quellen, Versionsangaben, Daten, Grenzen und Attribution. Unterscheide starke Belege, begrenzte Aussagen und austauschbare Inhalte ohne eigenen Informationsgewinn.
 
-Prüfe jeden Befund gegen den Kontext, bevor du ihn übernimmst. Zwei Beispiele, bei denen der Scan zwangsläufig zu wenig weiß:
+Bewerte Entity-Klarheit separat: Wer steht hinter der Aussage, welche Qualifikation ist belegt, und sind Angaben auf der Website konsistent? JSON-LD kann Maschinen helfen, Inhalte zu verstehen und Suchfunktionen zu ermöglichen. Fehlendes AI-spezifisches Schema ist kein GEO-Blocker. Erfinde keine Autorität aus bloß vorhandenen Markups. Siehe `references/entity-trust.md`.
 
-- Ein blockierter **Training**-Crawler (GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended) ist oft eine bewusste Entscheidung und kein Fehler. Er kostet keine Sichtbarkeit in Antworten. Melde ihn als Feststellung, nicht als Problem – und erkläre den Unterschied zu Retrieval-Crawlern, statt zum Entblocken zu drängen.
-- Ein fehlendes `dateModified` auf einer Impressumsseite ist bedeutungslos. Auf einem Fachartikel ist es relevant.
+## 5. Tatsächliche Sichtbarkeit
 
-Details zu allen Kriterien und ihrer Begründung: `references/geo-criteria.md`. Crawler-Übersicht mit Zweck und Auswirkung: `references/ai-crawlers.md`.
+Wenn belastbare Daten vorliegen, prüfe Citations, zitierte Seiten, Grounding Queries, Topics, Intents, Citation Share und zeitliche Entwicklung. Unterscheide klar:
 
-### Schritt 4: Inhalt selbst lesen
+- Citation ≠ Marken-Erwähnung
+- Erwähnung ≠ Empfehlung
+- Empfehlung ≠ Klick
+- Klick ≠ Conversion
 
-Der Scan misst Struktur und liefert sprachliche Kennzahlen. Er kann nicht beurteilen, **ob der Inhalt eine Frage beantwortet**. Das ist der wichtigste Teil und nur durch Lesen zu klären.
+Leite aus Citation-Zahlen keine Rankings ab. Wenn keine zuverlässigen Visibility-Daten vorliegen, sage das ausdrücklich und stelle Readiness-Befunde nicht als Sichtbarkeitsmessung dar. Details: `references/visibility-analysis.md`.
 
-Öffne eine oder zwei der wichtigsten Seiten und prüfe:
+## 6. Quellenumfeld und Geschäftswirkung
 
-- **Beantwortet die Seite eine Frage, die jemand tatsächlich stellt?** Oder beschreibt sie ein Thema, ohne eine Frage zu schließen? Themenseiten werden nicht zitiert, weil aus ihnen keine Antwort zu entnehmen ist.
-- **Steht die Antwort früh?** Antwortmaschinen bevorzugen Passagen, in denen die Aussage vor der Herleitung kommt. Ein Text, der auf eine Pointe hinarbeitet, wird schlechter zitiert – auch wenn er für Menschen besser zu lesen ist. Benenne diesen Zielkonflikt offen, statt eine Empfehlung zu geben, die den Stil des Autors überschreibt.
-- **Gibt es überprüfbare Substanz?** Zahlen, Beispiele, benannte Werkzeuge, Versionen, Grenzen. Allgemeine Aussagen ohne Beleg sind austauschbar, und ein Modell wählt bei Austauschbarkeit die etabliertere Quelle.
-- **Ist erkennbar, wer das schreibt und warum das qualifiziert?** Das ist der Punkt, an dem kleine Sites gegen große Portale gewinnen können.
+Ermittle bei strategischen Audits die Drittquellen, die Antworten zu den Zielthemen prägen können: Reviews, Publisher, Foren, Communities, Referenzseiten, Wettbewerber, Marktplätze und andere Fachquellen. Prüfe, ob die Entität dort korrekt vertreten ist und welche Quellenlücken bestehen. Siehe `references/source-ecosystem.md`.
 
-Konkrete Umformulierungsmuster mit Vorher/Nachher: `references/fix-patterns.md`.
+Wenn Analytics verfügbar sind, verbinde KI-Discovery mit Referral-Traffic, Engagement, Leads, Registrierungen, Warenkorbaktivität, Käufen, Umsatz oder Neukunden. Citations allein sind kein Geschäftserfolg.
 
-### Schritt 5: Ergebnis liefern
+## 7. Priorisieren und berichten
 
-Standardmäßig als Bericht im Chat, nicht als Datei – außer der Nutzer will ein Dokument.
+Vergib keinen scheinpräzisen GEO-Gesamtscore. Nutze Priorität **BLOCKER**, **HIGH IMPACT**, **OPPORTUNITY**, **MONITOR** oder **EXPERIMENTAL**. Kennzeichne Evidenz zusätzlich als **OBSERVED**, **MEASURED**, **DOCUMENTED**, **INFERRED** oder **HEURISTIC**. Eine Heuristik darf nicht als gemessene Wirkung ausgegeben werden. Definitionen: `references/prioritization.md`.
 
-Struktur:
+Nutze `references/output-template.md`. Trenne klar:
 
-1. **Ein Satz zum Gesamtbild.** Ehrlich. Wenn die Site technisch gut aufgestellt ist und nur inhaltlich Substanz fehlt, sage genau das.
-2. **Kritische Punkte** mit Begründung und konkretem Fix (Codeausschnitt, robots.txt-Zeile, JSON-LD-Block).
-3. **Mittlere Punkte**, nach Wirkung sortiert.
-4. **Hinweise**, gesammelt in einer Liste.
-5. **Was schon gut ist.** Nicht als Höflichkeit, sondern zur Abgrenzung: sonst ändert jemand etwas, das bereits funktioniert.
-6. **Was dieser Audit nicht zeigen kann** (siehe unten).
+- was kaputt ist, was verbessert werden kann und was bereits funktioniert
+- was tatsächlich gemessen oder beobachtet wurde und was erschlossen bzw. heuristisch ist
+- was mit den verfügbaren Daten nicht feststellbar ist
 
-Bei Befunden, die im Code behoben werden können und wo der Nutzer Zugriff auf das Repository hat: biete die Umsetzung an, statt sie nur zu beschreiben.
+## Experimentelle Signale
 
-### Schritt 6: llms.txt (nur auf Wunsch)
+Behandle `llms.txt` und ähnliche neue Konventionen als experimentell, solange keine zuverlässige Anbieter-Dokumentation eine relevante Nutzung belegt. Sie dürfen dokumentierte technische, inhaltliche, Autoritäts- und Sichtbarkeitsprobleme nicht überholen. Details: `references/experimental-signals.md` und `references/llms-txt.md`.
 
-Wenn eine `llms.txt` fehlt oder schwach ist, biete an, sie zu erzeugen. Format und Regeln: `references/llms-txt.md`.
+## Grenzen des Audits
 
-Zwei Dinge dabei richtig einordnen:
-
-- **Wirkung ist unbestätigt.** `llms.txt` ist ein Vorschlag, dessen Auswertung von den großen Anbietern nicht öffentlich zugesichert ist. Sie ist billig und unschädlich, aber verkaufe sie nicht als Hebel. Wer sie als Grund für ausbleibende Sichtbarkeit nennt, hat meist ein anderes Problem.
-- **Generieren, nicht pflegen.** Eine handgeschriebene `llms.txt` veraltet. Wenn das Projekt einen Generator für Sitemap oder Feeds hat, gehört sie dort hinein.
-
-## Was dieser Audit nicht zeigen kann
-
-Sage das aktiv – es verhindert falsche Erwartungen und ist der Teil, den vergleichbare Werkzeuge verschweigen:
-
-- **Keine Messung tatsächlicher Sichtbarkeit.** Ob ein Modell die Seite zitiert, hängt von Faktoren ab, die von außen nicht prüfbar sind: Trainingsdaten, Index-Stand, Autorität, Konkurrenz zur konkreten Frage. Der Audit prüft Voraussetzungen, nicht Ergebnisse.
-- **Keine Erfolgsgarantie.** Wenn jemand fragt „taucht meine Seite danach in ChatGPT auf?", ist die ehrliche Antwort: unbekannt. Was du zusagen kannst, ist, dass keine technische Hürde mehr im Weg steht.
-- **Kein Ersatz für eine Log-Analyse.** Ob KI-Crawler die Seite tatsächlich abrufen, steht in den Server-Logs. Verweise darauf, wenn Sichtbarkeit trotz sauberer Konfiguration ausbleibt – das ist dann der nächste sinnvolle Schritt.
-- **Nur serverseitiges HTML.** Clientseitig gerenderte Inhalte sieht der Scan nicht. Das ist keine Schwäche des Scans, sondern spiegelt die Sicht der meisten KI-Crawler: was JavaScript nachlädt, existiert für sie in der Regel nicht.
+Ein Readiness-Audit misst nicht automatisch tatsächliche Sichtbarkeit. Ein sauberer technischer Abruf garantiert keine Citation. Der Scanner sieht keine Inhalte, die erst clientseitig nachgeladen werden, und ein User-Agent-Test beweist nicht, dass ein Anbieter-Crawler den Abruf durchführen kann. Server-Logs und Plattformdaten sind dafür geeigneter. Der Audit verifiziert nicht automatisch die inhaltliche Wahrheit, Autorität oder Geschäftswirkung. Benenne diese Grenzen im Bericht, wenn sie für die Schlussfolgerung relevant sind.

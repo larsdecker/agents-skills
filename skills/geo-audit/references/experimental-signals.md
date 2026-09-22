@@ -1,0 +1,7 @@
+# Experimental Signals
+
+Treat `llms.txt` and similar emerging conventions as experimental unless current, reliable provider documentation or measured results for the stated objective show material use. Google Search Central says Google Search does not use `llms.txt` or other special AI files/markup for appearance in Search, including generative AI features. This does not establish how every other provider handles the format. A low-cost experiment may be reasonable, but do not present it as a known ranking or citation lever, and never use its absence to explain missing visibility.
+
+Prefer documented access requirements, useful content, first-party evidence, accurate entity information, observed citation patterns, and measured business outcomes. Bing Webmaster Tools' AI Performance reports citations, cited pages and grounding queries, with preview capabilities for intents, topics and citation share; its documentation cautions that these metrics do not measure rankings or authority. Record the hypothesis, effort, success measure, and review date for any experiment. Do not claim causality from a before/after change without accounting for other factors.
+
+Provider documentation: [Google Search generative AI guide](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), [Bing Webmaster Tools AI Performance](https://www.bing.com/webmasters/help/ai-performance-9f8e7d6c), [OpenAI crawler guidance](https://help.openai.com/en/articles/20001243-advertiser-guidance-for-allowing-openai-web-crawlers).

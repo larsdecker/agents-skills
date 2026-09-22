@@ -1,89 +1,21 @@
-# llms.txt: Format und Regeln
+# llms.txt: Experimentelles Format
 
-`llms.txt` liegt im Wurzelverzeichnis der Domain und beschreibt in Markdown, worum es auf der Site geht und welche Seiten die wichtigsten sind. Die Idee: ein Sprachmodell soll ohne Crawl der gesamten Site erkennen, was hier zu finden ist.
+`llms.txt` ist ein Community-Vorschlag für eine Markdown-Datei mit einer kurzen Site-Beschreibung und ausgewählten Links. Behandle sie als Experiment, nicht als Voraussetzung oder nachgewiesenen Hebel für KI-Sichtbarkeit. Google Search Central sagt, Google Search nutze `llms.txt` und ähnliche Spezialdateien nicht für die Darstellung in Search einschließlich generativer Suchfunktionen. Daraus lässt sich keine Aussage über sämtliche anderen Anbieter ableiten.
 
-**Ehrliche Einordnung vorweg:** Das Format ist ein Community-Vorschlag. Keiner der großen Anbieter hat öffentlich zugesichert, es auszuwerten. Der Aufwand ist minimal und es schadet nichts – aber wer ausbleibende Sichtbarkeit damit erklärt, sucht am falschen Ort. Kommuniziere sie als billige Ergänzung, nicht als Maßnahme mit belegter Wirkung.
+Wenn der Nutzer die Datei ausdrücklich wünscht oder ein dokumentiertes Experiment durchführen möchte, halte sie knapp und aktuell:
 
----
+```markdown
+# Name der Website
 
-## Aufbau
+> Kurze, sachliche Beschreibung der Website und ihrer Zielgruppe.
 
-````markdown
-# Name der Site
+## Themenbereich
 
-> Ein Satz, der beschreibt, worum es geht und für wen.
+- [Titel](https://example.com/pfad): Was die Seite tatsächlich behandelt.
+```
 
-Optionaler Absatz mit Kontext: Autor, Sprache, Art der Inhalte.
+Verwende echte URLs und Beschreibungen. Erfinde keine Fähigkeiten, Autorität oder Inhalte. Automatische Generierung aus vorhandenen Metadaten ist handgepflegten Listen vorzuziehen, falls eine Implementierung beschlossen wurde. Die Abwesenheit einer `llms.txt` darf nicht als Erklärung für fehlende Zitation ausgegeben werden.
 
-## Abschnitt
+`llms-full.txt` bündelt umfangreiche Texte und ist ebenfalls experimentell. Empfiehl die Datei nicht pauschal; prüfe Aktualisierung, Umfang und einen konkreten Nutzer- oder Provider-Anwendungsfall.
 
-- [Titel der Seite](https://example.com/pfad): Ein Satz, was dort steht.
-- [Weitere Seite](https://example.com/pfad2): Ein Satz, was dort steht.
-
-## Weiterer Abschnitt
-
-- [Seite](https://example.com/pfad3): Beschreibung.
-````
-
-**Verbindliche Elemente**
-
-1. **H1 mit dem Namen der Site.** Genau eine.
-2. **Blockquote direkt darunter** mit einer Ein-Satz-Zusammenfassung. Das ist die Zeile, die am wahrscheinlichsten gelesen wird – sie verdient die meiste Sorgfalt.
-3. **H2-Abschnitte** als Gruppierung.
-4. **Linkliste** mit absoluten URLs und je einer erklärenden Zeile nach dem Doppelpunkt.
-
-**Die Beschreibung nach dem Doppelpunkt ist der eigentliche Inhalt.** Eine Linkliste ohne Beschreibungen ist eine schlechtere Sitemap. Der Wert entsteht durch die kuratierte Einordnung – also genau dort, wo automatische Erfassung nicht hinkommt.
-
----
-
-## Regeln
-
-**Generieren, nicht pflegen.** Eine handgeschriebene `llms.txt` ist nach dem dritten neuen Artikel veraltet. Wenn das Projekt einen Generator für Sitemap oder Feeds hat, gehört sie in dieselbe Pipeline. Bei einem statischen Site-Generator ist das ein Script; bei Next.js eine Route unter `app/llms.txt/route.ts` mit `dynamic = 'force-static'`.
-
-**Kuratieren, nicht vollständig auflisten.** Bei 500 Seiten gehören nicht 500 Einträge hinein. Nimm die Seiten auf, die eigenständigen Wert haben, und lass Paginierung, Tag-Übersichten und Duplikate weg. Vollständigkeit ist die Aufgabe der Sitemap.
-
-**Als Markdown ausliefern.** `Content-Type: text/markdown; charset=utf-8`. Prüfe, dass der Pfad nicht von einer SPA-Catch-all-Route abgefangen wird – dann kommt HTML mit Status 200 zurück, und die Datei ist praktisch nicht vorhanden. Der Scan erkennt genau diesen Fall.
-
-**Sprache benennen**, wenn die Site nicht englisch ist. Ein Modell, das eine deutsche Antwort formuliert, kann deutsche Quellen gezielt vorziehen.
-
-**Keine Wiederholung der Navigation.** Impressum, Datenschutz und Kontakt gehören nicht in eine Datei, die inhaltliche Orientierung geben soll – außer die Site besteht im Wesentlichen daraus.
-
----
-
-## Beispiel: Blog einer Einzelperson
-
-````markdown
-# Lars Decker – Product Owner & Entwickler
-
-> Praxisberichte zu Produktmanagement, KI-Agenten in der Entwicklung und
-> Automatisierung, geschrieben von einem Product Owner mit Entwickler-Background.
-
-Autor: Lars Decker (https://lars-decker.eu/about). Sprache: Deutsch.
-Alle Artikel beruhen auf eigener Projekterfahrung, nicht auf Sekundärquellen.
-
-## Über den Autor
-
-- [Über Lars Decker](https://lars-decker.eu/about): Laufbahn von der Backend-Entwicklung zum Product Owner, Schwerpunkte und Arbeitsweise.
-
-## KI in der Produktentwicklung
-
-- [Wie ein Product Owner KI-Agenten führt](https://lars-decker.eu/blog/po-fuehrt-ki-agenten): Wann Ergebnisse eines Agenten ohne Review übernehmbar sind und wann nicht.
-- [Agent Harness im Vergleich](https://lars-decker.eu/blog/agent-harness-claude-code-codex-hermes-vergleich): Unterschiede zwischen Claude Code, Codex und Hermes bei Sandbox, Gedächtnis und Modellwahl.
-
-## Planung unter Unsicherheit
-
-- [Rolling Wave Planning in der Praxis](https://lars-decker.eu/blog/rolling-wave-planning-praxis): Wellenbasierte Planung mit ehrlichen Konfidenzhorizonten.
-
-## Feeds
-
-- [RSS](https://lars-decker.eu/rss.xml)
-- [Sitemap](https://lars-decker.eu/sitemap.xml)
-````
-
----
-
-## `llms-full.txt`
-
-Variante, die den vollständigen Textinhalt der Site in einer Datei bündelt. Sinnvoll bei Dokumentation, wo ein Modell den gesamten Bestand als Kontext braucht. Für einen Blog ist sie unnötig und erzeugt eine Datei von mehreren Megabyte, die niemand abruft.
-
-Schlage sie nur vor, wenn es um Produktdokumentation oder eine Referenz geht.
+Siehe [Google Search Central: Generative AI features and your website](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide).
